@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="chartDemoApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChartJS AngularJS Wrapper - Ejemplo Completo</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <!-- Chart.js con auto-registro -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+  <!-- ChartJS AngularJS Wrapper -->
+  <script src="chartjs-angular.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .chart-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 300px;
+      margin-bottom: 15px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-top: 30px;
+    }
+
+    .info-box h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .info-box ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .info-box li {
+      padding: 8px 0;
+      color: #555;
+    }
+
+    .info-box li:before {
+      content: "✓ ";
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body ng-controller="ChartDemoController">
+
+  <div class="container">
+    <h1>📊 ChartJS AngularJS Wrapper</h1>
+    <p class="subtitle">Ejemplos completos de todos los tipos de gráficos disponibles</p>
+
+    <div class="chart-grid">
+      <!-- Gráfico de Línea -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico de Línea</h2>
+        <div class="chart-wrapper">
+          <canvas chart-canvas
+                  chart-type="line"
+                  chart-data="lineData"
+                  chart-options="commonOptions"
+                  chart-id="lineChart">
+          </canvas>
+        </div>
+        <div class="controls">
+          <button ng-click="updateLineData()">Actualizar Datos</button>
+          <button ng-click="addLineDataPoint()">Agregar Punto</button>
+        </div>
+      </div>
+
+      <!-- Gráfico de Barras -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico de Barras</h2>
+        <div class="chart-wrapper">
+          <chart-bar chart-data="barData"
+                     chart-options="commonOptions"
+                     chart-id="barChart">
+          </chart-bar>
+        </div>
+        <div class="controls">
+          <button ng-click="updateBarData()">Actualizar Datos</button>
+          <button ng-click="toggleBarOrientation()">Cambiar Orientación</button>
+        </div>
+      </div>
+
+      <!-- Gráfico Circular (Pie) -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico Circular (Pie)</h2>
+        <div class="chart-wrapper">
+          <chart-pie chart-data="pieData"
+                     chart-options="pieOptions"
+                     chart-id="pieChart">
+          </chart-pie>
+        </div>
+        <div class="controls">
+          <button ng-click="updatePieData()">Actualizar Datos</button>
+        </div>
+      </div>
+
+      <!-- Gráfico de Dona (Doughnut) -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico de Dona (Doughnut)</h2>
+        <div class="chart-wrapper">
+          <chart-doughnut chart-data="doughnutData"
+                          chart-options="pieOptions"
+                          chart-id="doughnutChart">
+          </chart-doughnut>
+        </div>
+        <div class="controls">
+          <button ng-click="updateDoughnutData()">Actualizar Datos</button>
+        </div>
+      </div>
+
+      <!-- Gráfico de Radar -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico de Radar</h2>
+        <div class="chart-wrapper">
+          <chart-radar chart-data="radarData"
+                       chart-options="radarOptions"
+                       chart-id="radarChart">
+          </chart-radar>
+        </div>
+        <div class="controls">
+          <button ng-click="updateRadarData()">Actualizar Datos</button>
+        </div>
+      </div>
+
+      <!-- Gráfico de Área Polar -->
+      <div class="chart-card">
+        <h2 class="chart-title">Gráfico de Área Polar</h2>
+        <div class="chart-wrapper">
+          <chart-polar-area chart-data="polarData"
+                            chart-options="commonOptions"
+                            chart-id="polarChart">
+          </chart-polar-area>
+        </div>
+        <div class="controls">
+          <button ng-click="updatePolarData()">Actualizar Datos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información -->
+    <div class="info-box">
+      <h2>🚀 Características del Wrapper</h2>
+      <ul>
+        <li>Integración completa con Chart.js 4.x</li>
+        <li>Directivas declarativas para todos los tipos de gráficos</li>
+        <li>Actualización reactiva automática de datos y opciones</li>
+        <li>Servicio <code>ChartJsService</code> para gestión avanzada</li>
+        <li>Soporte para plugins personalizados</li>
+        <li>Callbacks para eventos del ciclo de vida</li>
+        <li>Compatible con AngularJS 1.2+</li>
+      </ul>
+    </div>
+
+    <div class="info-box" style="margin-top: 20px;">
+      <h2>📖 Tipos de Gráficos Disponibles</h2>
+      <ul>
+        <li><code>&lt;chart-line&gt;</code> - Gráficos de línea</li>
+        <li><code>&lt;chart-bar&gt;</code> - Gráficos de barras</li>
+        <li><code>&lt;chart-pie&gt;</code> - Gráficos circulares</li>
+        <li><code>&lt;chart-doughnut&gt;</code> - Gráficos de dona</li>
+        <li><code>&lt;chart-radar&gt;</code> - Gráficos de radar</li>
+        <li><code>&lt;chart-polar-area&gt;</code> - Gráficos de área polar</li>
+        <li><code>&lt;chart-bubble&gt;</code> - Gráficos de burbujas</li>
+        <li><code>&lt;chart-scatter&gt;</code> - Gráficos de dispersión</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Aplicación AngularJS
+    angular.module('chartDemoApp', ['chartjs-angular'])
+      .controller('ChartDemoController', function($scope) {
+
+        // Opciones comunes para todos los gráficos
+        $scope.commonOptions = {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          }
+        };
+
+        // Opciones para gráficos circulares
+        $scope.pieOptions = {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            }
+          }
+        };
+
+        // Opciones para gráfico de radar
+        $scope.radarOptions = {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+            r: {
+              beginAtZero: true
+            }
+          }
+        };
+
+        // === DATOS DE GRÁFICO DE LÍNEA ===
+        $scope.lineData = {
+          labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+          datasets: [{
+            label: 'Ventas 2024',
+            data: [12, 19, 3, 5, 2, 3],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.4
+          }]
+        };
+
+        $scope.updateLineData = function() {
+          $scope.lineData.datasets[0].data = $scope.lineData.labels.map(function() {
+            return Math.floor(Math.random() * 30);
+          });
+        };
+
+        $scope.addLineDataPoint = function() {
+          var months = ['Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+          var currentLength = $scope.lineData.labels.length;
+          if (currentLength < 12) {
+            $scope.lineData.labels.push(months[currentLength - 6]);
+            $scope.lineData.datasets[0].data.push(Math.floor(Math.random() * 30));
+          }
+        };
+
+        // === DATOS DE GRÁFICO DE BARRAS ===
+        $scope.barData = {
+          labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+          datasets: [{
+            label: 'Ingresos 2024',
+            data: [65, 59, 80, 81],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 2
+          }]
+        };
+
+        $scope.updateBarData = function() {
+          $scope.barData.datasets[0].data = $scope.barData.labels.map(function() {
+            return Math.floor(Math.random() * 100);
+          });
+        };
+
+        $scope.toggleBarOrientation = function() {
+          // Cambiar entre horizontal y vertical requeriría cambiar el tipo de gráfico
+          alert('Para cambiar la orientación, usa indexAxis: "y" en las opciones');
+        };
+
+        // === DATOS DE GRÁFICO CIRCULAR (PIE) ===
+        $scope.pieData = {
+          labels: ['Rojo', 'Azul', 'Amarillo', 'Verde', 'Morado'],
+          datasets: [{
+            label: 'Votos',
+            data: [12, 19, 3, 5, 2],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.8)',
+              'rgba(54, 162, 235, 0.8)',
+              'rgba(255, 206, 86, 0.8)',
+              'rgba(75, 192, 192, 0.8)',
+              'rgba(153, 102, 255, 0.8)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 2
+          }]
+        };
+
+        $scope.updatePieData = function() {
+          $scope.pieData.datasets[0].data = $scope.pieData.labels.map(function() {
+            return Math.floor(Math.random() * 30);
+          });
+        };
+
+        // === DATOS DE GRÁFICO DE DONA ===
+        $scope.doughnutData = {
+          labels: ['Desktop', 'Móvil', 'Tablet', 'Otros'],
+          datasets: [{
+            label: 'Tráfico por Dispositivo',
+            data: [45, 30, 20, 5],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.8)',
+              'rgba(54, 162, 235, 0.8)',
+              'rgba(255, 206, 86, 0.8)',
+              'rgba(75, 192, 192, 0.8)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 2
+          }]
+        };
+
+        $scope.updateDoughnutData = function() {
+          $scope.doughnutData.datasets[0].data = $scope.doughnutData.labels.map(function() {
+            return Math.floor(Math.random() * 50);
+          });
+        };
+
+        // === DATOS DE GRÁFICO DE RADAR ===
+        $scope.radarData = {
+          labels: ['Velocidad', 'Confiabilidad', 'Seguridad', 'Escalabilidad', 'Usabilidad'],
+          datasets: [{
+            label: 'Producto A',
+            data: [65, 59, 90, 81, 56],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)'
+          }, {
+            label: 'Producto B',
+            data: [28, 48, 40, 19, 96],
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)'
+          }]
+        };
+
+        $scope.updateRadarData = function() {
+          $scope.radarData.datasets[0].data = $scope.radarData.labels.map(function() {
+            return Math.floor(Math.random() * 100);
+          });
+          $scope.radarData.datasets[1].data = $scope.radarData.labels.map(function() {
+            return Math.floor(Math.random() * 100);
+          });
+        };
+
+        // === DATOS DE GRÁFICO DE ÁREA POLAR ===
+        $scope.polarData = {
+          labels: ['Norte', 'Sur', 'Este', 'Oeste', 'Centro'],
+          datasets: [{
+            label: 'Distribución Regional',
+            data: [11, 16, 7, 3, 14],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ]
+          }]
+        };
+
+        $scope.updatePolarData = function() {
+          $scope.polarData.datasets[0].data = $scope.polarData.labels.map(function() {
+            return Math.floor(Math.random() * 20);
+          });
+        };
+
+      });
+  </script>
+
+</body>
+</html>

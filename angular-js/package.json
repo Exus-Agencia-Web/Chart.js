@@ -1,0 +1,25 @@
+{
+  "name": "chartjs-angular",
+  "version": "1.0.0",
+  "description": "AngularJS wrapper for Chart.js - Legacy support for Angular 1.x applications",
+  "main": "chartjs-angular.js",
+  "keywords": [
+    "angularjs",
+    "angular",
+    "chart.js",
+    "charts",
+    "wrapper",
+    "directive"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "angular": "^1.2.0",
+    "chart.js": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chartjs/Chart.js.git",
+    "directory": "angular-js"
+  }
+}
