@@ -7,13 +7,13 @@ set -euo pipefail
 # Uso:
 #   bash scripts/release.sh <develop|production>
 #
-# Autenticación:
+# Autenticacion:
 #   Solo por llave SSH. Cada servidor puede tener su propia llave
-#   via el 5º campo del array (nombre de env var con el PEM).
+#   via el 5o campo del array (nombre de env var con el PEM).
 #
 # Opcional:
 #   RELEASE_CONFIG   Ruta a JSON con array "ignore". Default .vscode/sftp.json
-#   GH_BEFORE        SHA antes del push (github.event.before). Si está presente
+#   GH_BEFORE        SHA antes del push (github.event.before). Si esta presente
 #                    se usa como base del diff; si no, cae a HEAD~1.
 # ============================================================
 
@@ -22,7 +22,7 @@ DEVELOP_SERVERS=(
   "developers.pagegear.co|19840|ec2-user|/PageGearCloud/www/html/pge/dominios/Chart.js|AWS1_SSH_KEY"
 )
 
-# Servidores para rama master (producción)
+# Servidores para rama master (produccion)
 MASTER_SERVERS=(
   "cloud.pagegear.co|19840|ec2-user|/PageGearCloud/www/html/pge/dominios/Chart.js|AWS1_SSH_KEY"
 )
@@ -42,7 +42,7 @@ ts()   { date '+%H:%M:%S'; }
 log()  { printf '[release %s] %s\n' "$(ts)" "$*"; }
 err()  { printf '[release %s][ERROR] %s\n' "$(ts)" "$*" >&2; }
 die()  { err "$*"; exit 1; }
-step() { printf '[release %s]   → %s\n' "$(ts)" "$*"; }
+step() { printf '[release %s]   -> %s\n' "$(ts)" "$*"; }
 
 banner() {
   local title="$1" line
@@ -73,8 +73,8 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 cd "$REPO_ROOT"
 
 # ---------- Base commit ----------
-# USE_GH_BEFORE activo → usa GH_BEFORE (commits exactos del PR)
-# USE_GH_BEFORE vacío   → usa COMMITSDEPTH para la profundidad
+# USE_GH_BEFORE activo -> usa GH_BEFORE (commits exactos del PR)
+# USE_GH_BEFORE vacio   -> usa COMMITSDEPTH para la profundidad
 HEAD_COMMIT="$(git rev-parse HEAD)"
 NULL_SHA="0000000000000000000000000000000000000000"
 
@@ -97,7 +97,7 @@ fi
 log "Base commit: $BASE_COMMIT [$BASE_SOURCE]"
 log "Head commit: $HEAD_COMMIT"
 
-# ---------- Selección de servidores ----------
+# ---------- Seleccion de servidores ----------
 TARGET="${1:-}"
 [[ -n "$TARGET" ]] || die "Falta argumento de ambiente. Uso: release.sh <develop|production>"
 
@@ -115,15 +115,15 @@ case "$TARGET" in
     SERVERS=("${MASTER_SERVERS[@]+"${MASTER_SERVERS[@]}"}")
     ;;
   *)
-    die "Ambiente '$TARGET' no reconocido. Válidos: develop | production"
+    die "Ambiente '$TARGET' no reconocido. Validos: develop | production"
     ;;
 esac
 
-[[ "${#SERVERS[@]}" -gt 0 ]] || die "Array de servidores para '$TARGET' está vacío"
+[[ "${#SERVERS[@]}" -gt 0 ]] || die "Array de servidores para '$TARGET' esta vacio"
 for entry in "${SERVERS[@]}"; do
   IFS='|' read -r _h _p _u _rp _kv <<< "$entry"
   [[ -n "${_h:-}" && -n "${_p:-}" && -n "${_u:-}" && -n "${_rp:-}" ]] \
-    || die "Entrada SERVERS inválida: '$entry'"
+    || die "Entrada SERVERS invalida: '$entry'"
 done
 unset _h _p _u _rp _kv
 
@@ -179,7 +179,7 @@ resolve_ssh_key() {
       printf '%s' "$tmp"
       return 0
     fi
-    err "El servidor pide la llave '$key_var' pero la variable está vacía"
+    err "El servidor pide la llave '$key_var' pero la variable esta vacia"
     return 1
   fi
 
@@ -253,7 +253,7 @@ DELETE_COUNT=0
 [[ -s "$TMP_DELETE" ]] && DELETE_COUNT="$(wc -l < "$TMP_DELETE" | tr -d ' ')"
 
 # ---------- Header ----------
-banner "RELEASE [$ENV_LABEL] — target '$TARGET' (rama '${BRANCH:-?}')"
+banner "RELEASE [$ENV_LABEL] - target '$TARGET' (rama '${BRANCH:-?}')"
 log "Target         : $TARGET"
 log "Branch         : ${BRANCH:-<desconocida>}"
 log "Base commit    : $BASE_COMMIT [$BASE_SOURCE]"
@@ -289,21 +289,21 @@ deploy_server() {
   key_file="$(resolve_ssh_key "${key_var:-}")" || die "[$host] No se pudo resolver llave SSH"
   step "        llave lista: $key_file"
 
-  step "Paso 2/6: validando conectividad y versión rsync"
+  step "Paso 2/6: validando conectividad y version rsync"
   local remote_probe
   if ! remote_probe="$(ssh -i "$key_file" -p "$port" \
         -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=10 \
         "$user@$host" 'rsync --version 2>&1 | head -n1' 2>&1)"; then
     die "[$host] No se pudo conectar por SSH"
   fi
-  step "        conexión OK"
+  step "        conexion OK"
 
   local remote_rsync_ver
   remote_rsync_ver="$(printf '%s' "$remote_probe" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
   if [[ -z "$remote_rsync_ver" ]]; then
-    err "[$host] No se pudo detectar versión rsync"
+    err "[$host] No se pudo detectar version rsync"
   elif version_ge "$remote_rsync_ver" "$MIN_RSYNC_VERSION"; then
-    step "        rsync $remote_rsync_ver ✔"
+    step "        rsync $remote_rsync_ver OK"
   else
     err "[$host] rsync $remote_rsync_ver < $MIN_RSYNC_VERSION"
     if [[ "$AUTO_UPDATE_RSYNC" == "1" ]]; then
@@ -324,7 +324,7 @@ rsync --version 2>&1 | head -n1'
     fi
   fi
 
-  step "Paso 3/6: parámetros — host:$host port:$port remote:$remote_path"
+  step "Paso 3/6: parametros - host:$host port:$port remote:$remote_path"
   step "Paso 4/6: rsync (--delay-updates)"
   local ssh_cmd="ssh -i $key_file -p $port -o StrictHostKeyChecking=accept-new -o BatchMode=yes"
   local start_ts end_ts
@@ -359,11 +359,11 @@ rsync --version 2>&1 | head -n1'
              -o BatchMode=yes "$user@$host" 'xargs -0 -r rm -f --'; then
       err "[$host] Algunos archivos no se pudieron eliminar"
     fi
-    step "        eliminación OK"
+    step "        eliminacion OK"
   fi
 
   step "Paso 6/6: finalizado ($((end_ts - start_ts))s)"
-  log "[$host] ✔ OK"
+  log "[$host] OK"
 }
 
 TOTAL_SERVERS="${#SERVERS[@]}"
@@ -373,4 +373,4 @@ for entry in "${SERVERS[@]}"; do
   deploy_server "$IDX" "$TOTAL_SERVERS" "$entry"
 done
 
-banner "RELEASE [$ENV_LABEL] COMPLETADO — $TOTAL_SERVERS srv, $FILE_COUNT sub, $DELETE_COUNT del"
+banner "RELEASE [$ENV_LABEL] COMPLETADO - $TOTAL_SERVERS srv, $FILE_COUNT sub, $DELETE_COUNT del"
